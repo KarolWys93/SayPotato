@@ -1,0 +1,14 @@
+*[0-9].class
+*.class
+bin
+build
+.idea
+project
+target
+tests
+out
+.gradle
+.settings
+.classpath
+.project
+nullnull
