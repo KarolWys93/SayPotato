@@ -1,4 +1,4 @@
-package GUI;
+package sayPotato;
 
 import javax.sound.sampled.*;
 import java.io.ByteArrayInputStream;
