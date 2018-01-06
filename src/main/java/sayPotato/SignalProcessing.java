@@ -3,9 +3,6 @@ package sayPotato;
 import com.wyskocki.karol.dsp.*;
 import com.wyskocki.karol.dsp.filters.DigitalFilter;
 import com.wyskocki.karol.dsp.filters.Preemphasis;
-import org.jfree.chart.renderer.xy.XYBlockRenderer;
-import org.jfree.data.xy.DefaultXYZDataset;
-import org.jfree.data.xy.XYZDataset;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,7 +11,7 @@ public class SignalProcessing {
 
 
     public static ArrayList<double[]> framing(double[] data, int frameSize, int overlay){
-        ArrayList<double[]> framesTmp = new ArrayList<>(100);
+        ArrayList<double[]> framesTmp = new ArrayList<>(2*frameSize);
 
         int start = 0;
         int end = frameSize;
@@ -37,14 +34,14 @@ public class SignalProcessing {
         return framesTmp;
     }
 
-    public static ArrayList<Spectrum> createSpectrogram(ArrayList<double[]> data, double fSampling){
-        ArrayList<Spectrum> spectrums = new ArrayList<>(data.size());
-
-        for (double [] frame:data) {
+    public static ArrayList<Spectrum> createSpectrogram(ArrayList<double[]> frames, double fSampling){
+        ArrayList<Spectrum> spectrums = new ArrayList<>(frames.size());
+        HammingWindow window = new HammingWindow();
+        for (double [] frame:frames) {
             Spectrum spectrum = new Spectrum();
+            window.processing(frame);
             spectrum.calculate(frame, fSampling);
             spectrum.trim(0, 8000);
-            spectrum.normalize();
             spectrums.add(spectrum);
         }
         return spectrums;
