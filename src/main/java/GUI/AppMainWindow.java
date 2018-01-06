@@ -97,7 +97,7 @@ public class AppMainWindow extends JFrame {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 if (audioSignal != null) {
-                    int overlay = 64;
+                    int overlay = 512;
                     int frameSize = 1024;
                     double spectrumSpacing = (frameSize / format.getSampleRate()) - (overlay / format.getSampleRate());
 
@@ -207,6 +207,7 @@ public class AppMainWindow extends JFrame {
 
         spectrumView = new SpectrumView();
         ChartPanel spectrumChartPanel = new ChartPanel(spectrumView.getChart());
+        spectrumChartPanel.setMouseWheelEnabled(true);
         spectrumPanel.add(spectrumChartPanel, BorderLayout.CENTER);
 
     }

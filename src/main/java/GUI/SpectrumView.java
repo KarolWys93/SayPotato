@@ -4,6 +4,7 @@ import com.wyskocki.karol.dsp.Spectrum;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.NumberTickUnit;
 import org.jfree.chart.block.BlockBorder;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.*;
@@ -42,7 +43,12 @@ public class SpectrumView {
         xAxis.setLowerMargin(0.0);
         xAxis.setUpperMargin(0.0);
         xAxis.setAxisLinePaint(Color.white);
-        xAxis.setTickMarkPaint(Color.white);
+        xAxis.setTickMarkPaint(Color.RED);//Color.white);
+
+        xAxis.setAutoTickUnitSelection(true);
+        xAxis.setMinorTickMarksVisible(true);
+        //xAxis.setTickLabelsVisible(true);
+        xAxis.setTickMarksVisible(true);
 
         yAxis = new NumberAxis("frequency [Hz]");
         yAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
@@ -72,7 +78,7 @@ public class SpectrumView {
         //legend.setFrame(new BlockBorder(Color.red));
         legend.setPadding(new RectangleInsets(10, 10, 10, 10));
         legend.setStripWidth(10);
-        legend.setPosition(RectangleEdge.LEFT);
+        legend.setPosition(RectangleEdge.BOTTOM);
 
 
         plot = new XYPlot(dataset, xAxis, yAxis, renderer);
@@ -96,6 +102,23 @@ public class SpectrumView {
         dataset = createDataSet(spectrumData, timeSpace);
         plot.setDataset(dataset);
         renderer.setBlockHeight(spectrumData.get(0).getFreqDelta());
+        renderer.setBlockWidth(timeSpace);
+        xAxis.setRange(0, dataset.getXValue(1, dataset.getItemCount(1)));
+        scale = new GrayPaintScale(0, getMaxValue(spectrumData));
+        renderer.setPaintScale(scale);
+    }
+
+    private double getMaxValue(ArrayList<Spectrum> spectrumData){
+        double maxValue = 0;
+
+        for (Spectrum spectrum:spectrumData) {
+            for (double value:spectrum.getSpectrumData()) {
+                if (value > maxValue){
+                    maxValue = value;
+                }
+            }
+        }
+        return maxValue;
     }
 
     public JFreeChart getChart(){
@@ -129,7 +152,6 @@ public class SpectrumView {
 
             @Override
             public int getItemCount(int i) {
-                System.out.println("Spectogram length: "+ spectrumsCount * spectrumDuration + " s");
                 return spectrumsCount*spectrumSize;
             }
 
