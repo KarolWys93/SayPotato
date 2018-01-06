@@ -17,10 +17,13 @@ public class HammingWindow implements WindowFunction{
 
 
     @Override
-    public void processing(double[] data) {
+    public double[] processing(double[] data) {
+        double[] result = new double[data.length];
+
         for (int i = 0; i<data.length; i++){
             double window = alpha - beta*Math.cos((2*Math.PI*i)/(data.length-1));
-            data[i]*=window;
+            result [i] = data[i]*window;
         }
+        return result;
     }
 }

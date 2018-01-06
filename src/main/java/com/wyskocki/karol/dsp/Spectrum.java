@@ -54,8 +54,6 @@ public class Spectrum {
         if (endF > freqList[freqList.length-1])
             endIndex = freqList.length;
 
-        System.out.println("start: " + startIndex + " end: " + endIndex);
-
         freqList = Arrays.copyOfRange(freqList, startIndex, endIndex);
         spectrumData = Arrays.copyOfRange(spectrumData, startIndex, endIndex);
     }
@@ -91,18 +89,6 @@ public class Spectrum {
 
     private Complex[] fftTrim(Complex[] fft){
         return Arrays.copyOfRange(fft, 0, fft.length % 2 != 0 ? fft.length/2+1 : fft.length/2);
-    }
-
-    public void normalize(){
-        double maxValue = 0;
-        for (double sample : spectrumData) {
-            if(sample > maxValue)
-                maxValue = sample;
-        }
-
-        for (int i = 0; i < spectrumData.length; i++) {
-            spectrumData[i] /= maxValue;
-        }
     }
 
 }
