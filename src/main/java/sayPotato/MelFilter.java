@@ -4,7 +4,7 @@ import com.wyskocki.karol.dsp.Spectrum;
 
 import java.util.ArrayList;
 
-public class MelFilter {
+public abstract class MelFilter {
 
     //band limits in Hz
     double startFreq;
@@ -56,45 +56,12 @@ public class MelFilter {
         return 700 * (Math.pow(10, mel/2595) - 1);
     }
 
-    public double filter(Spectrum spectrum){
-        double midOfFilter = toHz(toMel(startFreq) + (getBandWidthMel())/2);
-        double midofFilterMel = toMel(midOfFilter);
-
-        double coefA1 = 1 / (midofFilterMel - getStartFreqMel());
-        double coefB1 = -coefA1*getStartFreqMel();
-
-        double coefA2 = -1 / (getEndFreqMel() - midofFilterMel);
-        double coefB2 = 1 - coefA2*midofFilterMel;
-
-        double bandEnergy = 0;
-
-        double sample;
-        double filterCoef;
-
-        for (int i = 0; i < spectrum.getSpectrumData().length; i++) {
-
-            if(spectrum.getFrequency(i) >= startFreq && spectrum.getFrequency(i) <= midOfFilter){
-                filterCoef = coefA1 * toMel(spectrum.getFrequency(i)) + coefB1;
-                sample = Math.pow(spectrum.getSpectrumData(i), 2) * filterCoef;
-
-            }else if (spectrum.getFrequency(i) > midOfFilter && spectrum.getFrequency(i) <= endFreq){
-                filterCoef = coefA2 * toMel(spectrum.getFrequency(i)) + coefB2;
-                sample = Math.pow(spectrum.getSpectrumData(i), 2) * filterCoef;
-
-            }else {
-                sample = 0;
-            }
-
-            bandEnergy += sample;
-        }
-
-        return bandEnergy;
-    }
+    public abstract double filter(Spectrum spectrum);
 
 
 
     public static void main(String[] args) {
-        MelFilter filter = new MelFilter();
+        MelFilter filter = new TriangleMelFilter();
 
         filter.setBandMel(600, 1200);
 
