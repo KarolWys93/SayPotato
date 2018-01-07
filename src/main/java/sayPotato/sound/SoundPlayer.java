@@ -1,4 +1,4 @@
-package sayPotato;
+package sayPotato.sound;
 
 import javax.sound.sampled.*;
 import java.io.ByteArrayInputStream;

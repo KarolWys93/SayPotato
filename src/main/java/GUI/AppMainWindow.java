@@ -2,12 +2,11 @@ package GUI;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
-import com.intellij.uiDesigner.core.Spacer;
 import com.wyskocki.karol.dsp.Spectrum;
 import org.jfree.chart.ChartPanel;
 import sayPotato.SignalProcessing;
-import sayPotato.SoundPlayer;
-import sayPotato.SoundRecorder;
+import sayPotato.sound.SoundPlayer;
+import sayPotato.sound.SoundRecorder;
 
 import javax.sound.sampled.*;
 import javax.swing.*;
