@@ -7,8 +7,8 @@ import java.util.ArrayList;
 public abstract class MelFilter {
 
     //band limits in Hz
-    double startFreq;
-    double endFreq;
+    private double startFreq;
+    private double endFreq;
 
     public void setBandHz(double startFreq, double endFreq){
         this.startFreq = startFreq;
