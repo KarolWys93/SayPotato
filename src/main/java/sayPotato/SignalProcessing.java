@@ -47,6 +47,51 @@ public class SignalProcessing {
         return spectrums;
     }
 
+    public static <T extends MelFilter >ArrayList<T> createFilters(Class<T> cl, double spectrumWidth, int filtersNum){
+        MelFilterFactor filterFactor = new MelFilterFactor();
+        int filterNum = filtersNum;
+        double bandWidth = MelFilter.toMel(spectrumWidth);
+        double filterMid = bandWidth/(filterNum+1);
+        return filterFactor.setOfFiltersMel(cl,filterMid*2,filterMid,filterNum);
+    }
+
+    public static double[] melScaleFiltering(Spectrum spectrum, ArrayList<? extends MelFilter> filters){
+
+        double[] filtersResults = new double[filters.size()];
+        int i = 0;
+        for (MelFilter filter : filters) {
+            filtersResults[i] = filter.filter(spectrum);
+            i++;
+        }
+
+        return filtersResults;
+    }
+
+    public static ArrayList<double[]> mfcc(double[] data, int mfccCoeffs){
+
+        ArrayList<double[]> frames = SignalProcessing.framing(data, 1024, 512);
+
+        ArrayList<Spectrum> spectrums = SignalProcessing.createSpectrogram(frames, 44100);
+
+        int filterNum = 22;
+        double bandWidth = spectrums.get(0).getSpectrumWidth();
+        ArrayList<TriangleMelFilter> filters = SignalProcessing.createFilters(TriangleMelFilter.class, bandWidth, filterNum);
+
+        ArrayList<double[]>melCoef = new ArrayList<>(spectrums.size());
+        for (Spectrum spectrum:spectrums) {
+            double[] xyz = (melScaleFiltering(spectrum, filters));
+
+            for (int i = 0; i < xyz.length; i++) {
+                xyz[i] = Math.log10(xyz[i]);
+            }
+
+            xyz = DCT.dct(xyz, mfccCoeffs+1);
+            melCoef.add(Arrays.copyOfRange(xyz, 1, xyz.length));
+        }
+
+        return melCoef;
+    }
+
 
     public static void main(String[] args) {
 
@@ -71,7 +116,7 @@ public class SignalProcessing {
         HammingWindow window = new HammingWindow();
 
 
-        double[] testowe = new double[128];
+        double[] testowe = new double[1024*10];
         double fSapling = 100;
         double freq = 5;
         double amp = 1;
@@ -96,17 +141,27 @@ public class SignalProcessing {
 
         window.processing(testowe);
 
-        spectrum.calculate(testowe, fSapling);
+//        spectrum.calculate(testowe, fSapling);
 
-        for (int i = 0; i < spectrum.getFrequency().length; i++) {
-            System.out.println(spectrum.getFrequency(i) + " " + spectrum.getSpectrumData(i));
-        }
+//        for (int i = 0; i < spectrum.getFrequency().length; i++) {
+//            System.out.println(spectrum.getFrequency(i) + " " + spectrum.getSpectrumData(i));
+//        }
 
-        spectrum.trim(4.0, 70.0);
+//        spectrum.trim(4.0, 70.0);
+
+//        System.out.println(" ");
+//        for (int i = 0; i < spectrum.getFrequency().length; i++) {
+//            System.out.println(spectrum.getFrequency(i) + " " + spectrum.getSpectrumData(i));
+//        }
 
         System.out.println(" ");
-        for (int i = 0; i < spectrum.getFrequency().length; i++) {
-            System.out.println(spectrum.getFrequency(i) + " " + spectrum.getSpectrumData(i));
+        System.out.println(" ");
+
+        for (double[] data:SignalProcessing.mfcc(testowe, 13)) {
+            for (int i = 0; i < data.length; i++) {
+                System.out.print(data[i]+" ");
+            }
+            System.out.println("");
         }
     }
 }

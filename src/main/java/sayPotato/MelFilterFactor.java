@@ -6,7 +6,7 @@ public class MelFilterFactor {
 
     public <T extends MelFilter> ArrayList<T> setOfFiltersMel(Class<T> tClass, double filterWidth, double overlay, int filterNum){
 
-        if(overlay >= filterNum){
+        if(overlay >= filterWidth){
             throw new IllegalArgumentException("Overlay must be smaller than filter width.");
         }
 

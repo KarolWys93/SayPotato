@@ -78,6 +78,10 @@ public class Spectrum {
         return freqDelta;
     }
 
+    public double getSpectrumWidth(){
+        return freqList[freqList.length-1];
+    }
+
     private double[] freqRange(double freqDelta, int spectrumWidth){
         double[] freqScale = new double[spectrumWidth];
 
