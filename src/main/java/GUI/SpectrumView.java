@@ -104,8 +104,28 @@ public class SpectrumView {
         renderer.setBlockHeight(spectrumData.get(0).getFreqDelta());
         renderer.setBlockWidth(timeSpace);
         xAxis.setRange(0, dataset.getXValue(1, dataset.getItemCount(1)));
-        scale = new GrayPaintScale(0, getMaxValue(spectrumData));
+        scale = createScale(getMaxValue(spectrumData));//new GrayPaintScale(0, getMaxValue(spectrumData));
         renderer.setPaintScale(scale);
+        legend.setScale(scale);
+        legend.setAxis(scaleAxis);
+    }
+
+    private PaintScale createScale(double maxValue){
+        LookupPaintScale scale;
+
+        scale = new LookupPaintScale(0, maxValue, Color.BLACK);
+        int scaleSize = 256;
+        double scaleStep = maxValue/scaleSize;
+
+        for (int i = 0; i < scaleSize; i++) {
+            if(i <= scaleSize/2-1)
+                scale.add(i*scaleStep, new Color(i*2, 0, 0));
+            else {
+                scale.add(i*scaleStep, new Color(255, (i-128)*2, 0));
+            }
+        }
+
+        return scale;
     }
 
     private double getMaxValue(ArrayList<Spectrum> spectrumData){
