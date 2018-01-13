@@ -1,6 +1,7 @@
 package com.wyskocki.karol.dsp.filters;
 
 /**
+ * Simple DC filter. This filter cut DC from signal.
  * Created by Karol on 03-06-2017.
  */
 public class SimpleDCfilter implements DigitalFilter {
@@ -8,6 +9,10 @@ public class SimpleDCfilter implements DigitalFilter {
     private double alpha;
     private double state;
 
+    /**
+     * Creates simple DC filter.
+     * @param alpha
+     */
     public SimpleDCfilter(double alpha) {
         this.alpha = alpha;
         state = 0;

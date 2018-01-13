@@ -5,8 +5,18 @@ import com.wyskocki.karol.dsp.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * Contains static methods using to preprocessing audio signal, before speech recognition.
+ */
 public class SignalProcessing {
 
+    /**
+     * Splits the audio signal into frames.
+     * @param data input audio signal
+     * @param frameSize number of samples in frame
+     * @param overlay number of overlayed samples
+     * @return Frames array. Single frame is array of double.
+     */
     public static ArrayList<double[]> framing(double[] data, int frameSize, int overlay){
         ArrayList<double[]> framesTmp = new ArrayList<>(2*frameSize);
 
@@ -31,6 +41,12 @@ public class SignalProcessing {
         return framesTmp;
     }
 
+    /**
+     * Creates array list of spectrums of framed signal.
+     * @param frames array list of signal frames
+     * @param fSampling sampling frequency of signal
+     * @return array list of spectrums
+     */
     public static ArrayList<Spectrum> createSpectrogram(ArrayList<double[]> frames, double fSampling){
         ArrayList<Spectrum> spectrums = new ArrayList<>(frames.size());
         HammingWindow window = new HammingWindow();
@@ -42,50 +58,5 @@ public class SignalProcessing {
             spectrums.add(spectrum);
         }
         return spectrums;
-    }
-
-    public static <T extends MelFilter >ArrayList<T> createFilters(Class<T> cl, double spectrumWidth, int filtersNum){
-        MelFilterFactor filterFactor = new MelFilterFactor();
-        int filterNum = filtersNum;
-        double bandWidth = MelFilter.toMel(spectrumWidth);
-        double filterMid = bandWidth/(filterNum+1);
-        return filterFactor.setOfFiltersMel(cl,filterMid*2,filterMid,filterNum);
-    }
-
-    public static double[] melScaleFiltering(Spectrum spectrum, ArrayList<? extends MelFilter> filters){
-
-        double[] filtersResults = new double[filters.size()];
-        int i = 0;
-        for (MelFilter filter : filters) {
-            filtersResults[i] = filter.filter(spectrum);
-            i++;
-        }
-
-        return filtersResults;
-    }
-
-    public static ArrayList<double[]> mfcc(double[] data, int mfccCoeffs){
-
-        ArrayList<double[]> frames = SignalProcessing.framing(data, 1024, 512);
-
-        ArrayList<Spectrum> spectrums = SignalProcessing.createSpectrogram(frames, 44100);
-
-        int filterNum = 22;
-        double bandWidth = spectrums.get(0).getSpectrumWidth();
-        ArrayList<TriangleMelFilter> filters = SignalProcessing.createFilters(TriangleMelFilter.class, bandWidth, filterNum);
-
-        ArrayList<double[]>melCoef = new ArrayList<>(spectrums.size());
-        for (Spectrum spectrum:spectrums) {
-            double[] xyz = (melScaleFiltering(spectrum, filters));
-
-            for (int i = 0; i < xyz.length; i++) {
-                xyz[i] = Math.log10(xyz[i]);
-            }
-
-            xyz = DCT.dct(xyz, mfccCoeffs+1);
-            melCoef.add(Arrays.copyOfRange(xyz, 1, xyz.length));
-        }
-
-        return melCoef;
     }
 }

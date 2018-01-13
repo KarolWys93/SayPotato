@@ -17,12 +17,16 @@ package com.wyskocki.karol.dsp;
  *
  *
  *  This code comes from the website:
- *  https://introcs.cs.princeton.edu/java/97data/InplaceFFT.java.html
+ *  <a href="https://introcs.cs.princeton.edu/java/97data/InplaceFFT.java.html">link</a>
  ******************************************************************************/
 
 public class FFT {
 
-    // compute the FFT of x[], assuming its length is a power of 2
+    /**
+     * Compute the FFT of x[], assuming its length is a power of 2
+     * @param data signal data
+     * @return fft result
+     */
     public static Complex[] fft(Complex[] data) {
 
         // check that length is a power of 2
@@ -60,7 +64,11 @@ public class FFT {
         return x;
     }
 
-    // compute the inverse FFT of x[], assuming its length is a power of 2
+    /**
+     * Compute the inverse FFT of x[], assuming its length is a power of 2
+     * @param x
+     * @return
+     */
     public static Complex[] ifft(Complex[] x) {
         int n = x.length;
         Complex[] y = new Complex[n];
@@ -87,7 +95,12 @@ public class FFT {
 
     }
 
-    // compute the circular convolution of x and y
+    /**
+     * compute the circular convolution of x and y
+     * @param x
+     * @param y
+     * @return
+     */
     public static Complex[] cconvolve(Complex[] x, Complex[] y) {
 
         // should probably pad x and y with 0s so that they have same length
@@ -112,7 +125,12 @@ public class FFT {
         return ifft(c);
     }
 
-    // compute the linear convolution of x and y
+    /**
+     * compute the linear convolution of x and y
+     * @param x
+     * @param y
+     * @return
+     */
     public static Complex[] convolve(Complex[] x, Complex[] y) {
         Complex ZERO = new Complex(0, 0);
 

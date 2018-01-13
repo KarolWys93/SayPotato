@@ -1,11 +1,10 @@
 package sayPotato;
 
 import com.wyskocki.karol.dsp.Spectrum;
-import java.util.ArrayList;
 
 /**
  * Abstract class of filter in mel-scale
- * For more information see en.wikipedia.org/wiki/Mel_scale
+ * For more information see <a href="en.wikipedia.org/wiki/Mel_scale">Mel scale</a>
  */
 public abstract class MelFilter {
 

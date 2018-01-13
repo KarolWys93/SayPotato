@@ -14,7 +14,7 @@ import java.util.Objects;
  *
  *
  *  This code comes from the website:
- *  https://introcs.cs.princeton.edu/java/97data/Complex.java.html
+ *  <br/><a href="https://introcs.cs.princeton.edu/java/97data/Complex.java.html">link</a>
  ******************************************************************************/
 public class Complex {
     private final double re;   // the real part

@@ -1,7 +1,17 @@
 package com.wyskocki.karol.dsp;
 
+/**
+ * Discrete cosine transform
+ * <br/>more info: <a href="https://en.wikipedia.org/wiki/Discrete_cosine_transform">DCT</a>
+ */
 public class DCT {
 
+    /**
+     * Calculates DCT
+     * @param data signal
+     * @param coefficientsNum number of DCT coefficients
+     * @return result of DCT
+     */
     static public double [] dct(double data[], int coefficientsNum){
         double[] g = new double[coefficientsNum];
         int N = data.length;
@@ -24,10 +34,22 @@ public class DCT {
         return g;
     }
 
+    /**
+     * Calculates DCT. Number od DCT coefficients is equal to input data length.
+     * @param data input data
+     * @return result of DCT
+     */
     static public double[] dct(double data[]){
         return dct(data, data.length);
     }
 
+    /**
+     * Calculates inverse DCT. This result is array. Size of this array is equal to dataLength parameter.
+     * Data length parameter must by equal to length of data before DCT computation. Otherwise, result will be incorrect.
+     * @param data input data
+     * @param dataLength length of data after IDCT
+     * @return data after IDCT
+     */
     static public double[] idct(double data[], int dataLength){
         double[] g = new double[dataLength];
         double N = dataLength;
@@ -48,29 +70,12 @@ public class DCT {
         return g;
     }
 
+    /**
+     * Calculates inverse DCT. Size of result array is the same as input array size.
+     * @param data input array
+     * @return data after IDCT
+     */
     static public double[] idct(double[] data){
         return idct(data, data.length);
     }
-
-    public static void main(String[] args) {
-        double[] dataTest = new double[128];
-
-        for (int i = 0; i < dataTest.length; i++) {
-            dataTest[i] = Math.sin(2*Math.PI*0.01*i*4) + Math.random()*0.4;
-        }
-
-        double[] dataAfterDCT = DCT.dct(dataTest, 64);
-        double[] dataAfterIDCT = DCT.idct(dataAfterDCT, 128);
-
-        boolean isOk = true;
-
-        for (int i = 0; i < dataAfterIDCT.length; i++) {
-            System.out.println(dataTest[i]+ " " + "." + " " + dataAfterIDCT[i]);
-            if (Math.abs(dataTest[i] - dataAfterIDCT[i]) > 0.2)
-                isOk = false;
-        }
-
-        System.out.println("Test ok: " + isOk);
-    }
-
 }

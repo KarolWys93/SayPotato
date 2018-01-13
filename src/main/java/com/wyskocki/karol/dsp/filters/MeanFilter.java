@@ -1,6 +1,7 @@
 package com.wyskocki.karol.dsp.filters;
 
 /**
+ * Mean filter
  * Created by Karol on 04-06-2017.
  */
 public class MeanFilter implements DigitalFilter {
@@ -9,6 +10,10 @@ public class MeanFilter implements DigitalFilter {
     private double [] state;
     private int actualStatePointer;
 
+    /**
+     * Creates mean filter. Filter window size is a number of samples, which are using to mean calculation.
+     * @param windowWidth size of filtering window
+     */
     public MeanFilter(int windowWidth) {
         this.windowWidth = windowWidth;
         state = new double[windowWidth];

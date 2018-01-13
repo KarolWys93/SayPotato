@@ -2,6 +2,9 @@ package sayPotato;
 
 import com.wyskocki.karol.dsp.Spectrum;
 
+/**
+ * This type of mel-scale filter has shape of triangle window function.
+ */
 public class TriangleMelFilter extends MelFilter{
 
     @Override

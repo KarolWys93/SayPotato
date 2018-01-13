@@ -3,6 +3,9 @@ package sayPotato.sound;
 import javax.sound.sampled.*;
 import java.io.ByteArrayInputStream;
 
+/**
+ * SoundPlayer is able to play recorded sound.
+ */
 public class SoundPlayer implements Runnable {
 
     private Thread thread;
@@ -16,7 +19,11 @@ public class SoundPlayer implements Runnable {
     private double position = -1;
     private boolean running = false;
 
-
+    /**
+     * Plays sound form input byte array
+     * @param input array of bytes
+     * @param format data format
+     */
     public void play(byte[] input, AudioFormat format){
         if (running)
             return;
@@ -36,11 +43,18 @@ public class SoundPlayer implements Runnable {
         thread.start();
     }
 
+    /**
+     * Stops play sound
+     */
     public void stop(){
         System.out.println("Stop play signal");
         thread = null;
     }
 
+    /**
+     * Return true, if sound is playing
+     * @return
+     */
     public boolean isRuning(){
         return running;
     }
@@ -133,7 +147,10 @@ public class SoundPlayer implements Runnable {
         listener.changePosition(position);
     }
 
-
+    /**
+     * Adds position listener. In PlayerPositionListener object is called changePosition method, when sound is playing.
+     * @param listener
+     */
     public void addPositionListener(PlayerPositionListener listener){
         this.listener = listener;
     }

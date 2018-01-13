@@ -1,6 +1,7 @@
 package com.wyskocki.karol.dsp.filters;
 
 /**
+ * Digital FIR filter
  * Created by Karol on 03-06-2017.
  */
 public class FIRfilter implements DigitalFilter{
@@ -8,6 +9,10 @@ public class FIRfilter implements DigitalFilter{
     private double bCoeffs[];
     private double state[];
 
+    /**
+     * Creates FIR filter
+     * @param bCoeffs coefficients of digital filter
+     */
     public FIRfilter(double bCoeffs[]) {
         this.bCoeffs = bCoeffs;
         state = new double[bCoeffs.length-1];

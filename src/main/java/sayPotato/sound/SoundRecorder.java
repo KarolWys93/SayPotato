@@ -4,6 +4,9 @@ import javax.sound.sampled.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+/**
+ * Recording sound
+ */
 public class SoundRecorder implements Runnable {
 
     private Thread thread = null;
@@ -13,6 +16,10 @@ public class SoundRecorder implements Runnable {
 
     private boolean running = false;
 
+    /**
+     * Starts recording sound
+     * @param format record data format
+     */
     public void startRecord(AudioFormat format){
 
         this.format = format;
@@ -22,10 +29,17 @@ public class SoundRecorder implements Runnable {
         thread.start();
     }
 
+    /**
+     * Stops recording
+     */
     public void stop(){
         thread = null;
     }
 
+    /**
+     * Return true, if recording is running
+     * @return
+     */
     public boolean isRunning(){
         return running;
     }
@@ -80,6 +94,10 @@ public class SoundRecorder implements Runnable {
         System.out.println("End of record");
     }
 
+    /**
+     * Returns recorded sound as array of bytes.
+     * @return
+     */
     public byte[] getSoundRecord(){
         return soundRecord;
     }

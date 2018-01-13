@@ -1,14 +1,26 @@
 package com.wyskocki.karol.dsp.filters;
 
+/**
+ * Preemphasis filter. Causes gain of high frequencies, and damping low frequencies.
+ * <br/> x<sub>n</sub>' = x<sub>n</sub> - alpha * x<sub>n-1</sub>
+ * <br/> more info: <a href="https://en.wikipedia.org/wiki/Emphasis_(telecommunications)">preemphasis</a>
+ */
 public class Preemphasis implements DigitalFilter{
 
     double lastState = 0;
     double alpha = 0;
 
+    /**
+     * Creates preemphasis filter. Alpha = 0.97
+     */
     public Preemphasis(){
         alpha = 0.97;
     }
 
+    /**
+     * Creates preemphsasis filter
+     * @param alpha
+     */
     public Preemphasis(double alpha){
         this.alpha = alpha;
     }
