@@ -15,18 +15,8 @@ public class SoundSaver {
     private AudioFileFormat.Type fileType = AudioFileFormat.Type.WAVE;
     private String path;
     private File wavFile;
-
-    AudioFormat getAudioFormat(){
-        float sampleRate = 44100;
-        int sampleSizeInBits = 16;
-        int channels = 1;
-        boolean signed = true;
-        boolean bigEndian = true;
-        AudioFormat format = new AudioFormat(sampleRate, sampleSizeInBits, channels, signed,bigEndian);
-        return format;
-    }
-
-    public void saveRecord(byte [] record){
+    
+    public void saveRecord(byte [] record, AudioFormat format){
 
         chooser.addChoosableFileFilter(new FileNameExtensionFilter(".wav", "wav"));
         int returnVal = chooser.showSaveDialog(null);
@@ -35,7 +25,6 @@ public class SoundSaver {
             path = chooser.getSelectedFile().getPath();
             wavFile = new File(path);
             try{
-                AudioFormat format = getAudioFormat();
                 AudioInputStream ais = new AudioInputStream(new ByteArrayInputStream(record), format, record.length);
 
                 AudioSystem.write(ais, fileType, wavFile);

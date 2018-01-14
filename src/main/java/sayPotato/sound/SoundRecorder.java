@@ -82,7 +82,7 @@ public class SoundRecorder implements Runnable {
         //Zapis do pliku
         SoundSaver saver = new SoundSaver();
 
-        saver.saveRecord(soundRecord);
+        saver.saveRecord(soundRecord, format);
     }
 
     public byte[] getSoundRecord(){
