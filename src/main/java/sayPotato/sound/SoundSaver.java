@@ -1,8 +1,5 @@
 package sayPotato.sound;
 
-
-
-
 import java.io.*;
 import javax.swing.*;
 import javax.sound.sampled.*;
@@ -15,7 +12,7 @@ public class SoundSaver {
     private AudioFileFormat.Type fileType = AudioFileFormat.Type.WAVE;
     private String path;
     private File wavFile;
-    
+
     public void saveRecord(byte [] record, AudioFormat format){
 
         chooser.addChoosableFileFilter(new FileNameExtensionFilter(".wav", "wav"));
@@ -25,7 +22,7 @@ public class SoundSaver {
             path = chooser.getSelectedFile().getPath();
             wavFile = new File(path);
             try{
-                AudioInputStream ais = new AudioInputStream(new ByteArrayInputStream(record), format, record.length);
+                AudioInputStream ais = new AudioInputStream(new ByteArrayInputStream(record), format, record.length/format.getFrameSize());
 
                 AudioSystem.write(ais, fileType, wavFile);
                 ais.close();
