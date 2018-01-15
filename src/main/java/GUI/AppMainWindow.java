@@ -7,6 +7,7 @@ import com.wyskocki.karol.dsp.filters.Preemphasis;
 import org.jfree.chart.ChartPanel;
 import sayPotato.MFCC;
 import sayPotato.SignalProcessing;
+import sayPotato.SpeechDetection;
 import sayPotato.sound.SoundPlayer;
 import sayPotato.sound.SoundRecorder;
 
@@ -41,6 +42,9 @@ public class AppMainWindow extends JFrame {
 
     private byte[] audioSignal;
     private ArrayList<MFCC> mfccArray;
+
+
+    SpeechDetection sd = new SpeechDetection();
 
 
     public AppMainWindow(String windowName) {
@@ -108,6 +112,9 @@ public class AppMainWindow extends JFrame {
                     vectorGenerate();
                     stopTime = System.currentTimeMillis();
                     System.out.println("Running time: " + (stopTime - startTime) + " ms");
+                    for (SpeechDetection.Section section : sd.getWords()) {
+                        System.out.println("Start: " + (section.start * 10) + " ms, End: " + (section.end * 10) + " ms");
+                    }
                 }
             }
         });
@@ -229,7 +236,9 @@ public class AppMainWindow extends JFrame {
         double spectrumSpacing = (frameSize / format.getSampleRate()) - (overlay / format.getSampleRate());
         Preemphasis preemphasis = new Preemphasis();
 
-        ArrayList<double[]> frames = SignalProcessing.framing(preemphasis.filter(convertToWave(audioSignal)), frameSize, overlay);
+        double[] waweSignal = convertToWave(audioSignal);
+
+        ArrayList<double[]> frames = SignalProcessing.framing(preemphasis.filter(waweSignal), frameSize, overlay);
         ArrayList<Spectrum> spectrums = SignalProcessing.createSpectrogram(frames, format.getSampleRate());
         spectrumView.setSpectrum(spectrums, spectrumSpacing);
 
@@ -239,6 +248,7 @@ public class AppMainWindow extends JFrame {
             mfcc.calculate(spectrum);
             mfccArray.add(mfcc);
         }
+        sd.speechDetect(waweSignal, format.getSampleRate());
     }
 
     /**
