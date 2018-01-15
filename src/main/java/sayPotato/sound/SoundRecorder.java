@@ -80,8 +80,9 @@ public class SoundRecorder implements Runnable {
         System.out.println("End of record");
 
         //Zapis do pliku
-        SoundSaver saver = new SoundSaver();
 
+
+        SoundSaver saver = new SoundSaver();
         saver.saveRecord(soundRecord, format);
     }
 

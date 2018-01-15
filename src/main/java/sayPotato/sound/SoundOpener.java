@@ -28,7 +28,7 @@ public class SoundOpener {
 
     public byte[] getSoundByteArray() {
 
-        wavFile = new File(path);
+        wavFile = new File(getFilePath());
 
         try {
             AudioInputStream ais = AudioSystem.getAudioInputStream(wavFile);
