@@ -92,6 +92,7 @@ public class SoundRecorder implements Runnable {
         soundRecord = out.toByteArray();
         running = false;
         System.out.println("End of record");
+
     }
 
     /**
