@@ -1,34 +1,17 @@
 package sayPotato.sound;
 
 import java.io.*;
-import javax.swing.*;
 import javax.sound.sampled.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
+
 
 public class SoundOpener {
 
-    private JFileChooser chooser = new JFileChooser();
     private byte[] audio;
-    private String path;
     private File wavFile;
 
+    public byte[] getSoundByteArray(String path) {
 
-    public String getFilePath() {
-
-        chooser.addChoosableFileFilter(new FileNameExtensionFilter(".wav", "wav"));
-        int returnVal = chooser.showOpenDialog(null);
-
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            path = chooser.getSelectedFile().getPath();
-        } else if (returnVal == JFileChooser.CANCEL_OPTION) {
-            JOptionPane.showMessageDialog(null, "File opening has been canceled");
-        }
-        return path;
-    }
-
-    public byte[] getSoundByteArray() {
-
-        wavFile = new File(getFilePath());
+        wavFile = new File(path);
 
         try {
             AudioInputStream ais = AudioSystem.getAudioInputStream(wavFile);
