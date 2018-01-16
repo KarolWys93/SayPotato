@@ -5,11 +5,16 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class FilePath {
 
-    private JFileChooser chooser = new JFileChooser();
-    private String path;
+
+    private JFileChooser chooser;
+
+    public FilePath(){
+        chooser = new JFileChooser();
+        chooser.addChoosableFileFilter(new FileNameExtensionFilter(".wav", "wav"));
+    }
 
     public String getSavePath(){
-        chooser.addChoosableFileFilter(new FileNameExtensionFilter(".wav", "wav"));
+        String path = null;
         int returnVal = chooser.showSaveDialog(null);
 
         if(returnVal == JFileChooser.APPROVE_OPTION){
@@ -23,8 +28,7 @@ public class FilePath {
     }
 
     public String getOpenPath() {
-
-        chooser.addChoosableFileFilter(new FileNameExtensionFilter(".wav", "wav"));
+        String path = null;
         int returnVal = chooser.showOpenDialog(null);
 
         if (returnVal == JFileChooser.APPROVE_OPTION) {

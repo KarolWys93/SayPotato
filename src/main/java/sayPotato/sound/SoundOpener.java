@@ -6,12 +6,10 @@ import javax.sound.sampled.*;
 
 public class SoundOpener {
 
-    private byte[] audio;
-    private File wavFile;
 
-    public byte[] getSoundByteArray(String path) {
-
-        wavFile = new File(path);
+    public static byte[] getSoundByteArray(String path) {
+        byte[] audio = null;
+        File wavFile = new File(path);
 
         try {
             AudioInputStream ais = AudioSystem.getAudioInputStream(wavFile);
