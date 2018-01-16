@@ -5,11 +5,14 @@ import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.wyskocki.karol.dsp.Spectrum;
 import com.wyskocki.karol.dsp.filters.Preemphasis;
 import org.jfree.chart.ChartPanel;
+import sayPotato.FilePath;
 import sayPotato.MFCC;
 import sayPotato.SignalProcessing;
 import sayPotato.SpeechDetection;
+import sayPotato.sound.SoundOpener;
 import sayPotato.sound.SoundPlayer;
 import sayPotato.sound.SoundRecorder;
+import sayPotato.sound.SoundSaver;
 
 import javax.sound.sampled.*;
 import javax.swing.*;
@@ -29,6 +32,8 @@ public class AppMainWindow extends JFrame {
     private JButton analysisBtn;
     private JPanel spectrumPanel;
     private JButton showMFCCbtn;
+    private JButton loadBtn;
+    private JButton saveBtn;
 
     private SignalView signalView;
     private SpectrumView spectrumView;
@@ -44,7 +49,8 @@ public class AppMainWindow extends JFrame {
     private ArrayList<MFCC> mfccArray;
 
 
-    SpeechDetection sd = new SpeechDetection();
+    SpeechDetection speechDetection = new SpeechDetection();
+    FilePath recordFileSelector = new FilePath();
 
 
     public AppMainWindow(String windowName) {
@@ -112,7 +118,7 @@ public class AppMainWindow extends JFrame {
                     vectorGenerate();
                     stopTime = System.currentTimeMillis();
                     System.out.println("Running time: " + (stopTime - startTime) + " ms");
-                    for (SpeechDetection.Section section : sd.getWords()) {
+                    for (SpeechDetection.Section section : speechDetection.getWords()) {
                         System.out.println("Start: " + (section.start * 10) + " ms, End: " + (section.end * 10) + " ms");
                     }
                 }
@@ -128,6 +134,27 @@ public class AppMainWindow extends JFrame {
         });
 
         mfccViewTable = new MFCCViewTable();
+        loadBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                String filePath = recordFileSelector.getOpenPath();
+                if (filePath != null) {
+                    audioSignal = SoundOpener.getSoundByteArray(filePath);
+                    signalView.setData(convertToWave(audioSignal), format.getSampleRate());
+                }
+            }
+        });
+        saveBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (audioSignal != null) {
+                    String filePath = recordFileSelector.getSavePath();
+                    if (filePath != null) {
+                        SoundSaver.saveRecord(audioSignal, format, filePath);
+                    }
+                }
+            }
+        });
     }
 
 
@@ -248,7 +275,7 @@ public class AppMainWindow extends JFrame {
             mfcc.calculate(spectrum);
             mfccArray.add(mfcc);
         }
-        sd.speechDetect(waweSignal, format.getSampleRate());
+        speechDetection.speechDetect(waweSignal, format.getSampleRate());
     }
 
     /**
@@ -263,30 +290,33 @@ public class AppMainWindow extends JFrame {
         mainPanel = new JPanel();
         mainPanel.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
         final JPanel panel1 = new JPanel();
-        panel1.setLayout(new GridLayoutManager(2, 2, new Insets(0, 0, 0, 0), -1, -1));
+        panel1.setLayout(new GridLayoutManager(2, 4, new Insets(0, 0, 0, 0), -1, -1));
         mainPanel.add(panel1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         panel1.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Voice record"));
         recordBtn = new JButton();
         recordBtn.setText("Record");
-        panel1.add(recordBtn, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel1.add(recordBtn, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         playBtn = new JButton();
         playBtn.setText("Play");
-        panel1.add(playBtn, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panel1.add(signalPanel, new GridConstraints(1, 0, 1, 2, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, 1, new Dimension(-1, 200), new Dimension(-1, 200), null, 0, false));
+        panel1.add(playBtn, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel1.add(signalPanel, new GridConstraints(1, 0, 1, 4, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, 1, new Dimension(-1, 200), new Dimension(-1, 200), null, 0, false));
+        loadBtn = new JButton();
+        loadBtn.setText("Load");
+        panel1.add(loadBtn, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        saveBtn = new JButton();
+        saveBtn.setText("Save");
+        panel1.add(saveBtn, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel2 = new JPanel();
-        panel2.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
+        panel2.setLayout(new GridLayoutManager(2, 2, new Insets(0, 0, 0, 0), -1, -1));
         mainPanel.add(panel2, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         panel2.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Spectrum"));
-        panel2.add(spectrumPanel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
-        final JPanel panel3 = new JPanel();
-        panel3.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
-        panel2.add(panel3, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        showMFCCbtn = new JButton();
-        showMFCCbtn.setText("Show MFCC");
-        panel3.add(showMFCCbtn, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel2.add(spectrumPanel, new GridConstraints(1, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         analysisBtn = new JButton();
         analysisBtn.setText("Analysis");
-        panel3.add(analysisBtn, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel2.add(analysisBtn, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        showMFCCbtn = new JButton();
+        showMFCCbtn.setText("Show MFCC");
+        panel2.add(showMFCCbtn, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**

@@ -106,8 +106,9 @@ public class SpectrumView {
         xAxis.setRange(0, dataset.getXValue(1, dataset.getItemCount(1)));
         scale = createScale(getMaxValue(spectrumData));//new GrayPaintScale(0, getMaxValue(spectrumData));
         renderer.setPaintScale(scale);
-        legend.setScale(scale);
-        legend.setAxis(scaleAxis);
+        legend.setScale(createScale(1));
+        //legend.setAxis(scaleAxis);
+        legend.setSubdivisionCount(256);
     }
 
     private PaintScale createScale(double maxValue){
