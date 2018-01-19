@@ -20,6 +20,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public class AppMainWindow extends JFrame {
@@ -34,10 +35,12 @@ public class AppMainWindow extends JFrame {
     private JButton showMFCCbtn;
     private JButton loadBtn;
     private JButton saveBtn;
+    private JButton speechDetectButton;
 
     private SignalView signalView;
     private SpectrumView spectrumView;
     private MFCCViewTable mfccViewTable;
+    private SpeechDetectWindow detectWindow;
 
     //audio
     AudioFormat format = new AudioFormat(44100f, 16, 1, true, false);
@@ -64,6 +67,7 @@ public class AppMainWindow extends JFrame {
 
         recorder = new SoundRecorder();
         player = new SoundPlayer();
+        detectWindow = new SpeechDetectWindow();
 
         player.addPositionListener(new SoundPlayer.PlayerPositionListener() {
             @Override
@@ -118,9 +122,6 @@ public class AppMainWindow extends JFrame {
                     vectorGenerate();
                     stopTime = System.currentTimeMillis();
                     System.out.println("Running time: " + (stopTime - startTime) + " ms");
-                    for (SpeechDetection.Section section : speechDetection.getWords()) {
-                        System.out.println("Start: " + (section.start * 10) + " ms, End: " + (section.end * 10) + " ms");
-                    }
                 }
             }
         });
@@ -153,6 +154,28 @@ public class AppMainWindow extends JFrame {
                         SoundSaver.saveRecord(audioSignal, format, filePath);
                     }
                 }
+            }
+        });
+        speechDetectButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+
+                if (audioSignal != null) {
+                    speechDetection.speechDetect(convertToWave(audioSignal), format.getSampleRate());
+                    if (detectWindow.showDialog(speechDetection.getWords())) {
+                        SpeechDetection.Section section = detectWindow.getSelected();
+                        if (section == null) {
+                            return;
+                        }
+                        System.out.println("Start: " + (section.start * 10) + " ms, End: " + (section.end * 10) + " ms");
+                        audioSignal = Arrays.copyOfRange(audioSignal,
+                                (int) (section.start * 0.01 * format.getSampleRate() * 2),
+                                (int) (section.end * 0.01 * format.getSampleRate() * 2));
+                        signalView.setData(convertToWave(audioSignal), format.getSampleRate());
+
+                    }
+                }
+
             }
         });
     }
@@ -263,9 +286,7 @@ public class AppMainWindow extends JFrame {
         double spectrumSpacing = (frameSize / format.getSampleRate()) - (overlay / format.getSampleRate());
         Preemphasis preemphasis = new Preemphasis();
 
-        double[] waweSignal = convertToWave(audioSignal);
-
-        ArrayList<double[]> frames = SignalProcessing.framing(preemphasis.filter(waweSignal), frameSize, overlay);
+        ArrayList<double[]> frames = SignalProcessing.framing(preemphasis.filter(convertToWave(audioSignal)), frameSize, overlay);
         ArrayList<Spectrum> spectrums = SignalProcessing.createSpectrogram(frames, format.getSampleRate());
         spectrumView.setSpectrum(spectrums, spectrumSpacing);
 
@@ -275,7 +296,6 @@ public class AppMainWindow extends JFrame {
             mfcc.calculate(spectrum);
             mfccArray.add(mfcc);
         }
-        speechDetection.speechDetect(waweSignal, format.getSampleRate());
     }
 
     /**
@@ -290,7 +310,7 @@ public class AppMainWindow extends JFrame {
         mainPanel = new JPanel();
         mainPanel.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
         final JPanel panel1 = new JPanel();
-        panel1.setLayout(new GridLayoutManager(2, 4, new Insets(0, 0, 0, 0), -1, -1));
+        panel1.setLayout(new GridLayoutManager(2, 5, new Insets(0, 0, 0, 0), -1, -1));
         mainPanel.add(panel1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         panel1.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Voice record"));
         recordBtn = new JButton();
@@ -299,13 +319,16 @@ public class AppMainWindow extends JFrame {
         playBtn = new JButton();
         playBtn.setText("Play");
         panel1.add(playBtn, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panel1.add(signalPanel, new GridConstraints(1, 0, 1, 4, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, 1, new Dimension(-1, 200), new Dimension(-1, 200), null, 0, false));
+        panel1.add(signalPanel, new GridConstraints(1, 0, 1, 5, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, 1, new Dimension(-1, 200), new Dimension(-1, 200), null, 0, false));
         loadBtn = new JButton();
         loadBtn.setText("Load");
         panel1.add(loadBtn, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         saveBtn = new JButton();
         saveBtn.setText("Save");
         panel1.add(saveBtn, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        speechDetectButton = new JButton();
+        speechDetectButton.setText("Speech detect");
+        panel1.add(speechDetectButton, new GridConstraints(0, 4, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel2 = new JPanel();
         panel2.setLayout(new GridLayoutManager(2, 2, new Insets(0, 0, 0, 0), -1, -1));
         mainPanel.add(panel2, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));

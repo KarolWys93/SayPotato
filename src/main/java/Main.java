@@ -23,11 +23,11 @@ public class Main {
 
     private static void runGUI(){
 
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
         frame = new AppMainWindow(appName);
         frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);

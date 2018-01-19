@@ -107,7 +107,6 @@ public class SpeechDetection {
                 }
             }
 
-            System.out.println(test + " Old start: " + oldStart + " new start: " + section.start);
 
             searchEnd = oldEnd+frames250ms < zcr.length ? oldEnd+frames250ms : zcr.length;
             crossingCounter = 0;
@@ -124,7 +123,6 @@ public class SpeechDetection {
                 }
             }
 
-            System.out.println(test + " Old end: " + oldStart + " new end: " + section.start);
 
         }
     }
