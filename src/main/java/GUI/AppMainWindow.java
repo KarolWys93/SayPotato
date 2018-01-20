@@ -36,11 +36,16 @@ public class AppMainWindow extends JFrame {
     private JButton loadBtn;
     private JButton saveBtn;
     private JButton speechDetectButton;
+    private JButton potatoButton;
+    private JButton tomatoButton;
 
     private SignalView signalView;
     private SpectrumView spectrumView;
     private MFCCViewTable mfccViewTable;
     private SpeechDetectWindow detectWindow;
+
+
+    int iterator = 0;
 
     //audio
     AudioFormat format = new AudioFormat(44100f, 16, 1, true, false);
@@ -178,6 +183,42 @@ public class AppMainWindow extends JFrame {
 
             }
         });
+        potatoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+
+                ArrayList<String> filePaths = new ArrayList<>(101);
+                for (int i = 1; i <= 101; i++) {
+                    filePaths.add("/home/karol/Muzyka/SayPotato/WINDOW/window" + String.format("%03d", i) + ".wav");
+                }
+
+                audioSignal = SoundOpener.getSoundByteArray(filePaths.get(iterator));
+                signalView.setData(convertToWave(audioSignal), format.getSampleRate());
+
+                speechDetection.speechDetect(convertToWave(audioSignal), format.getSampleRate());
+                if (detectWindow.showDialog(speechDetection.getWords())) {
+                    SpeechDetection.Section section = detectWindow.getSelected();
+                    if (section == null) {
+                        return;
+                    }
+                    System.out.println("Start: " + (section.start * 10) + " ms, End: " + (section.end * 10) + " ms");
+                    audioSignal = Arrays.copyOfRange(audioSignal,
+                            (int) (section.start * 0.01 * format.getSampleRate() * 2),
+                            (int) (section.end * 0.01 * format.getSampleRate() * 2));
+                    signalView.setData(convertToWave(audioSignal), format.getSampleRate());
+
+                }
+                iterator++;
+
+            }
+        });
+        tomatoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                String filepath = "/home/karol/Muzyka/SayPotato/WINDOW_cut/window" + String.format("%03d", iterator + 1) + ".wav";
+                SoundSaver.saveRecord(audioSignal, format, filepath);
+            }
+        });
     }
 
 
@@ -310,7 +351,7 @@ public class AppMainWindow extends JFrame {
         mainPanel = new JPanel();
         mainPanel.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
         final JPanel panel1 = new JPanel();
-        panel1.setLayout(new GridLayoutManager(2, 5, new Insets(0, 0, 0, 0), -1, -1));
+        panel1.setLayout(new GridLayoutManager(2, 7, new Insets(0, 0, 0, 0), -1, -1));
         mainPanel.add(panel1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         panel1.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Voice record"));
         recordBtn = new JButton();
@@ -329,6 +370,12 @@ public class AppMainWindow extends JFrame {
         speechDetectButton = new JButton();
         speechDetectButton.setText("Speech detect");
         panel1.add(speechDetectButton, new GridConstraints(0, 4, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        potatoButton = new JButton();
+        potatoButton.setText("Potato");
+        panel1.add(potatoButton, new GridConstraints(0, 5, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        tomatoButton = new JButton();
+        tomatoButton.setText("Tomato");
+        panel1.add(tomatoButton, new GridConstraints(0, 6, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel2 = new JPanel();
         panel2.setLayout(new GridLayoutManager(2, 2, new Insets(0, 0, 0, 0), -1, -1));
         mainPanel.add(panel2, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
