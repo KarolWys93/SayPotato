@@ -2,8 +2,6 @@ package sayPotato;
 
 
 import be.ac.ulg.montefiore.run.jahmm.*;
-import be.ac.ulg.montefiore.run.jahmm.io.*;
-import be.ac.ulg.montefiore.run.jahmm.learn.BaumWelchLearner;
 import be.ac.ulg.montefiore.run.jahmm.learn.BaumWelchScaledLearner;
 import be.ac.ulg.montefiore.run.jahmm.learn.KMeansLearner;
 import com.wyskocki.karol.dsp.Spectrum;
@@ -12,59 +10,53 @@ import sayPotato.sound.SoundOpener;
 
 import javax.sound.sampled.AudioFormat;
 import java.io.*;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HMMWraper {
+public class HMMContainer implements Serializable{
 
-
-    int states = 30;    //liczba stanów modelu
-
+    private String modelName = "no name";
+    private int states = 30;
+    private int iteration = 9;
 
     Hmm<ObservationVector> model;
 
-    public HMMWraper(){
+    public HMMContainer(){
+    }
 
+    public HMMContainer(String modelName, int states, int iteration){
+        this.modelName = modelName;
+        this.states = states;
+        this.iteration = iteration;
     }
 
 
-    public HMMWraper(String filePath){
-        try {
-            FileReader fileReader = new FileReader(filePath);
-            HmmReader reader = new HmmReader();
-            model = reader.read(fileReader, new OpdfMultiGaussianReader());
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (FileFormatException e) {
-            e.printStackTrace();
+    public HMMContainer(String filePath){
+
+        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(filePath))) {
+            HMMContainer loadedModel = (HMMContainer) inputStream.readObject();
+            modelName = loadedModel.getModelName();
+            states = loadedModel.getStates();
+            iteration = loadedModel.getIteration();
+            model = loadedModel.getModel();
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
-
-
-        //TODO Odczytywanie modelu z pliku
     }
 
     public void saveModel(String path){
-        try {
-            FileWriter writer = new FileWriter(path);
-            HmmWriter hmmWriter = new HmmWriter();
-            OpdfMultiGaussianWriter opdfWriter = new OpdfMultiGaussianWriter();
-            hmmWriter.write(writer, opdfWriter, model);
-            DecimalFormat f = new DecimalFormat();
-
-
+        try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(path))) {
+            outputStream.writeObject(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //TODO save model to file.
     }
 
     public void learn(ArrayList<String> filePaths){
         List<List<ObservationVector>> sequences = new ArrayList<>(filePaths.size());
 
-        //Files reading and MFCCs calculating
 
         System.out.println("Start reading files");
         for (String path:filePaths) {
@@ -77,13 +69,6 @@ public class HMMWraper {
 
         System.out.println("Start KMenasLearner...");
 
-        int sumOfObservation = 0;
-        for (List<ObservationVector> vectors:sequences) {
-            sumOfObservation += vectors.size();
-        }
-
-        //states = (int)(sumOfObservation/sequences.size());
-
         OpdfMultiGaussianFactory factory = new OpdfMultiGaussianFactory(13);
         KMeansLearner< ObservationVector > kml = new KMeansLearner <>(states ,factory, sequences );
         Hmm<ObservationVector> initHmm = kml.iterate();
@@ -92,13 +77,65 @@ public class HMMWraper {
         System.out.println("Start BaumWelchLearner...");
 
         BaumWelchScaledLearner bwls = new BaumWelchScaledLearner();
-        BaumWelchLearner bwl = new BaumWelchLearner();
+        bwls.setNbIterations(iteration);
         model = bwls.learn (initHmm , sequences);
         System.out.println("End BaumWelchLearner...");
-
-
     }
 
+
+    public double check(List<ObservationVector> sequence){
+        double probability = model.probability(sequence);
+        System.out.println("probability: "+probability);
+        return probability;
+    }
+
+
+    public String getModelName() {
+        return modelName;
+    }
+
+    public int getStates() {
+        return states;
+    }
+
+    public int getIteration() {
+        return iteration;
+    }
+
+    public Hmm<ObservationVector> getModel() {
+        return model;
+    }
+
+    public void setModelName(String modelName) {
+        this.modelName = modelName;
+    }
+
+    public void setStates(int states) {
+        this.states = states;
+    }
+
+    public void setIteration(int iteration) {
+        this.iteration = iteration;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //TODO Przenieść to gdzieś indziej
     private ArrayList<MFCC> getMFCCs(byte[] audioSignal){
 
         //audio
@@ -142,26 +179,51 @@ public class HMMWraper {
         return signalWave;
     }
 
-    public double check(List<ObservationVector> sequence){
-        double prop = model.probability(sequence);
-        System.out.println("Propabylity: "+prop*100 + " %");
-        return prop;
-        //TODO sprawdzanie, czy obserwacja należy do tego modelu. Powinno zwracać prawdopodobieństwo.
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     public static void main(String[] args) {
 
-        ArrayList<HMMWraper> models = new ArrayList<>();
+        ArrayList<HMMContainer> models = new ArrayList<>();
         ArrayList<ArrayList<String>> files = new ArrayList<>();
 
-//        HMMWraper windowModel = new HMMWraper();
-//        HMMWraper onModel = new HMMWraper();
-//        HMMWraper offModel = new HMMWraper();
+//        HMMContainer windowModel = new HMMContainer("Window", 30, 3);
+//        HMMContainer onModel = new HMMContainer("On", 30, 3);
+//        HMMContainer offModel = new HMMContainer("Off", 30, 3);
 
-        HMMWraper windowModel = new HMMWraper("./model0.hmm");
-        HMMWraper onModel = new HMMWraper("./model0.hmm");
-        HMMWraper offModel = new HMMWraper("./model0.hmm");
+        HMMContainer windowModel = new HMMContainer("./model0.hmm");
+        HMMContainer onModel = new HMMContainer("./model1.hmm");
+        HMMContainer offModel = new HMMContainer("./model2.hmm");
 
         ArrayList<String> windowFiles = new ArrayList<>(99);
         ArrayList<String> onFiles = new ArrayList<>(99);
@@ -221,7 +283,7 @@ public class HMMWraper {
 //        for (String test:testPaths) {
 //            System.out.println("Testing file: "+test);
 //            List<ObservationVector> testSequence = getVectorForTest(test);
-//            for (HMMWraper model:models) {
+//            for (HMMContainer model:models) {
 //                model.check(testSequence);
 //            }
 //        }
