@@ -36,6 +36,8 @@ public class AppMainWindow extends JFrame {
     private JButton loadBtn;
     private JButton saveBtn;
     private JButton speechDetectButton;
+    private JTabbedPane tabbedPane;
+    private JPanel createModelPanel;
 
     private SignalView signalView;
     private SpectrumView spectrumView;
@@ -64,6 +66,7 @@ public class AppMainWindow extends JFrame {
         // DO NOT EDIT OR ADD ANY CODE HERE!
         $$$setupUI$$$();
         getContentPane().add(mainPanel);
+
 
         recorder = new SoundRecorder();
         player = new SoundPlayer();
@@ -277,7 +280,9 @@ public class AppMainWindow extends JFrame {
         ChartPanel spectrumChartPanel = new ChartPanel(spectrumView.getChart());
         spectrumChartPanel.setMouseWheelEnabled(true);
         spectrumPanel.add(spectrumChartPanel, BorderLayout.CENTER);
-
+        createModelPanel = new JPanel();
+        createModelPanel.setLayout(new BorderLayout());
+        createModelPanel.add(new ModelCreate(), BorderLayout.CENTER);
     }
 
     private void vectorGenerate() {
@@ -329,9 +334,11 @@ public class AppMainWindow extends JFrame {
         speechDetectButton = new JButton();
         speechDetectButton.setText("Speech detect");
         panel1.add(speechDetectButton, new GridConstraints(0, 4, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        tabbedPane = new JTabbedPane();
+        mainPanel.add(tabbedPane, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(200, 200), null, 0, false));
         final JPanel panel2 = new JPanel();
         panel2.setLayout(new GridLayoutManager(2, 2, new Insets(0, 0, 0, 0), -1, -1));
-        mainPanel.add(panel2, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        tabbedPane.addTab("Analysis", panel2);
         panel2.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Spectrum"));
         panel2.add(spectrumPanel, new GridConstraints(1, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         analysisBtn = new JButton();
@@ -340,6 +347,10 @@ public class AppMainWindow extends JFrame {
         showMFCCbtn = new JButton();
         showMFCCbtn.setText("Show MFCC");
         panel2.add(showMFCCbtn, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final JPanel panel3 = new JPanel();
+        panel3.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        tabbedPane.addTab("Create model", panel3);
+        panel3.add(createModelPanel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
     }
 
     /**
