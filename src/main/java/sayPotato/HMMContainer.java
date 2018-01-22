@@ -83,7 +83,9 @@ public class HMMContainer implements Serializable{
     }
 
 
-    public double check(List<ObservationVector> sequence){
+    public double check(ArrayList<MFCC> mfccsSequence){
+        List<ObservationVector> sequence = convertMFCCArrayToListOfObservetionVector(mfccsSequence);
+
         double probability = model.probability(sequence);
         System.out.println("probability: "+probability);
         return probability;

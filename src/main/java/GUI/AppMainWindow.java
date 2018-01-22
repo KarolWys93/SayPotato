@@ -38,6 +38,8 @@ public class AppMainWindow extends JFrame {
     private JButton speechDetectButton;
     private JTabbedPane tabbedPane;
     private JPanel createModelPanel;
+    private ModelRecognizeWindow recognizePanel;
+    private JPanel recognizePanel2;
 
     private SignalView signalView;
     private SpectrumView spectrumView;
@@ -145,6 +147,7 @@ public class AppMainWindow extends JFrame {
                 if (filePath != null) {
                     audioSignal = SoundOpener.getSoundByteArray(filePath);
                     signalView.setData(convertToWave(audioSignal), format.getSampleRate());
+                    recognizePanel.setAudioSignal(audioSignal);
                 }
             }
         });
@@ -175,7 +178,7 @@ public class AppMainWindow extends JFrame {
                                 (int) (section.start * 0.01 * format.getSampleRate() * 2),
                                 (int) (section.end * 0.01 * format.getSampleRate() * 2));
                         signalView.setData(convertToWave(audioSignal), format.getSampleRate());
-
+                        recognizePanel.setAudioSignal(audioSignal);
                     }
                 }
 
@@ -231,6 +234,7 @@ public class AppMainWindow extends JFrame {
         }
         audioSignal = recorder.getSoundRecord();
         signalView.setData(convertToWave(audioSignal), format.getSampleRate());
+        recognizePanel.setAudioSignal(audioSignal);
 
         playBtn.setEnabled(true);
         recordBtn.setText("Record");
@@ -283,6 +287,9 @@ public class AppMainWindow extends JFrame {
         createModelPanel = new JPanel();
         createModelPanel.setLayout(new BorderLayout());
         createModelPanel.add(new ModelCreate(), BorderLayout.CENTER);
+
+        recognizePanel = new ModelRecognizeWindow();
+        recognizePanel2 = (JPanel) recognizePanel;
     }
 
     private void vectorGenerate() {
@@ -351,6 +358,10 @@ public class AppMainWindow extends JFrame {
         panel3.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
         tabbedPane.addTab("Create model", panel3);
         panel3.add(createModelPanel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        final JPanel panel4 = new JPanel();
+        panel4.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        tabbedPane.addTab("Recognize", panel4);
+        panel4.add(recognizePanel2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
     }
 
     /**
